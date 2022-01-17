@@ -1,120 +1,123 @@
-import sys
-import pygame
-from pygame.locals import *
+#!/usr/bin/env python
 
-bar_heigh=150
-bar_width=30
-border_color =  [255, 0, 0]
+# PPM.py
+# 2016-02-19
+# Public Domain
 
-FPS = 30 #frames per second setting
-fpsClock = pygame.time.Clock()
+import time
+import pigpio  # http://abyz.me.uk/rpi/pigpio/python.html
 
 
-pygame.init();
-pygame.display.set_caption("Joystick to PPM")
+class X:
+    GAP = 300
+    WAVES = 3
 
-screen = pygame.display.set_mode([200, 600], 0, 32)
+    def __init__(self, pi, gpio, channels=8, frame_ms=27):
+        self.pi = pi
+        self.gpio = gpio
 
+        if frame_ms < 5:
+            frame_ms = 5
+            channels = 2
+        elif frame_ms > 100:
+            frame_ms = 100
 
-# Draw some black (Transparent) polygons to create mountain peaks
-# The screen is 600 wide so I've drawn 10 polygons at 60 pixels wide each
-trottle_now=0
-trottle_max=2000
-trottle_ltx=10
-trottle_lty=30
-trottle_color =  [0, 0, 255]
+        self.frame_ms = frame_ms
 
-pitch_now=0
-pitch_max=2000
-pitch_ltx=50
-pitch_lty=30
-pitch_color =  [0, 0, 255]
+        self._frame_us = int(frame_ms * 1000)
+        self._frame_secs = frame_ms / 1000.0
 
-roll_now=0
-roll_max=2000
-roll_ltx=100
-roll_lty=30
-roll_color =  [0, 0, 255]
+        if channels < 1:
+            channels = 1
+        elif channels > (frame_ms // 2):
+            channels = int(frame_ms // 2)
 
-yaw_now=0
-yaw_max=2000
-yaw_ltx=150
-yaw_lty=30
-yaw_color =  [0, 0, 255]
+        self.channels = channels
 
-Velocity=50
+        self._widths = [1000] * channels  # set each channel to minimum pulse width
 
-while True:
-    screen.fill((100, 100, 100))
+        self._wid = [None] * self.WAVES
+        self._next_wid = 0
 
-    trottle_now = trottle_now + Velocity
-    if trottle_now >= 2000: Velocity *= -1
-    if trottle_now <= 0: Velocity *= -1
-    current_trottle_pix = bar_heigh * trottle_now / trottle_max
+        pi.write(gpio, pigpio.LOW)
 
+        self._update_time = time.time()
 
+    def _update(self):
+        wf = []
+        micros = 0
+        for i in self._widths:
+            wf.append(pigpio.pulse(1 << self.gpio, 0, self.GAP))
+            wf.append(pigpio.pulse(0, 1 << self.gpio, i - self.GAP))
+            micros += i
+        # off for the remaining frame period
+        wf.append(pigpio.pulse(1 << self.gpio, 0, self.GAP))
+        micros += self.GAP
+        wf.append(pigpio.pulse(0, 1 << self.gpio, self._frame_us - micros))
 
+        self.pi.wave_add_generic(wf)
+        wid = self.pi.wave_create()
+        self.pi.wave_send_using_mode(wid, pigpio.WAVE_MODE_REPEAT_SYNC)
+        self._wid[self._next_wid] = wid
 
-    font = pygame.font.SysFont("Arial", 13)
-    text = font.render("THR", True, trottle_color)
-    screen.blit(text, (trottle_ltx, trottle_lty - text.get_height()))
-    pygame.draw.line(screen, border_color, (trottle_ltx, trottle_lty), (trottle_ltx + bar_width, trottle_lty), 2)
-    pygame.draw.line(screen, border_color, (trottle_ltx + bar_width, trottle_lty),(trottle_ltx + bar_width, trottle_lty + bar_heigh), 2)
-    pygame.draw.line(screen, border_color, (trottle_ltx + bar_width, trottle_lty + bar_heigh),(trottle_ltx, trottle_lty + bar_heigh), 2)
-    pygame.draw.line(screen, border_color, (trottle_ltx, trottle_lty + bar_heigh), (trottle_ltx, trottle_lty), 2)
-    pygame.draw.polygon(screen, trottle_color, [(int(trottle_ltx+2),int(trottle_lty+bar_heigh-2)), (int(trottle_ltx+bar_width-1),int(trottle_lty+bar_heigh-2)), (int(trottle_ltx+bar_width-1),int(trottle_lty+bar_heigh-current_trottle_pix)), (int(trottle_ltx+2),int(trottle_lty+bar_heigh-current_trottle_pix))])
+        self._next_wid += 1
+        if self._next_wid >= self.WAVES:
+            self._next_wid = 0
 
-    font = pygame.font.SysFont("Arial", 13)
-    text = font.render("PTH", True, pitch_color)
-    screen.blit(text, (pitch_ltx, pitch_lty - text.get_height()))
-    pygame.draw.line(screen, border_color, (pitch_ltx, pitch_lty), (pitch_ltx + bar_width, pitch_lty), 2)
-    pygame.draw.line(screen, border_color, (pitch_ltx + bar_width, pitch_lty),
-                     (pitch_ltx + bar_width, pitch_lty + bar_heigh), 2)
-    pygame.draw.line(screen, border_color, (pitch_ltx + bar_width, pitch_lty + bar_heigh),
-                     (pitch_ltx, pitch_lty + bar_heigh), 2)
-    pygame.draw.line(screen, border_color, (pitch_ltx, pitch_lty + bar_heigh), (pitch_ltx, pitch_lty), 2)
-    pygame.draw.polygon(screen, pitch_color, [(int(pitch_ltx + 2), int(pitch_lty + bar_heigh - 2)),
-                                                (int(pitch_ltx + bar_width - 1), int(pitch_lty + bar_heigh - 2)), (
-                                                int(pitch_ltx + bar_width - 1),
-                                                int(pitch_lty + bar_heigh - current_trottle_pix)),
-                                                (int(pitch_ltx + 2), int(pitch_lty + bar_heigh - current_trottle_pix))])
+        remaining = self._update_time + self._frame_secs - time.time()
+        if remaining > 0:
+            time.sleep(remaining)
+        self._update_time = time.time()
 
-    font = pygame.font.SysFont("Arial", 13)
-    text = font.render("YAW", True, yaw_color)
-    screen.blit(text, (yaw_ltx, yaw_lty - text.get_height()))
-    pygame.draw.line(screen, border_color, (yaw_ltx, yaw_lty), (yaw_ltx + bar_width, yaw_lty), 2)
-    pygame.draw.line(screen, border_color, (yaw_ltx + bar_width, yaw_lty),
-                     (yaw_ltx + bar_width, yaw_lty + bar_heigh), 2)
-    pygame.draw.line(screen, border_color, (yaw_ltx + bar_width, yaw_lty + bar_heigh),
-                     (yaw_ltx, yaw_lty + bar_heigh), 2)
-    pygame.draw.line(screen, border_color, (yaw_ltx, yaw_lty + bar_heigh), (yaw_ltx, yaw_lty), 2)
-    pygame.draw.polygon(screen, yaw_color, [(int(yaw_ltx + 2), int(yaw_lty + bar_heigh - 2)),
-                                              (int(yaw_ltx + bar_width - 1), int(yaw_lty + bar_heigh - 2)), (
-                                                  int(yaw_ltx + bar_width - 1),
-                                                  int(yaw_lty + bar_heigh - current_trottle_pix)),
-                                              (int(yaw_ltx + 2), int(yaw_lty + bar_heigh - current_trottle_pix))])
+        wid = self._wid[self._next_wid]
+        if wid is not None:
+            self.pi.wave_delete(wid)
+            self._wid[self._next_wid] = None
 
-    font = pygame.font.SysFont("Arial", 13)
-    text = font.render("ROL", True, roll_color)
-    screen.blit(text, (roll_ltx, roll_lty - text.get_height()))
-    pygame.draw.line(screen, border_color, (roll_ltx, roll_lty), (roll_ltx + bar_width, roll_lty), 2)
-    pygame.draw.line(screen, border_color, (roll_ltx + bar_width, roll_lty),
-                     (roll_ltx + bar_width, roll_lty + bar_heigh), 2)
-    pygame.draw.line(screen, border_color, (roll_ltx + bar_width, roll_lty + bar_heigh),
-                     (roll_ltx, roll_lty + bar_heigh), 2)
-    pygame.draw.line(screen, border_color, (roll_ltx, roll_lty + bar_heigh), (roll_ltx, roll_lty), 2)
-    pygame.draw.polygon(screen, roll_color, [(int(roll_ltx + 2), int(roll_lty + bar_heigh - 2)),
-                                            (int(roll_ltx + bar_width - 1), int(roll_lty + bar_heigh - 2)), (
-                                                int(roll_ltx + bar_width - 1),
-                                                int(roll_lty + bar_heigh - current_trottle_pix)),
-                                            (int(roll_ltx + 2), int(roll_lty + bar_heigh - current_trottle_pix))])
+    def update_channel(self, channel, width):
+        self._widths[channel] = width
+        self._update()
 
-    for event in pygame.event.get():
-        if event.type == QUIT:
-            pygame.quit()
-            sys.exit()
-    pygame.display.update()
-    fpsClock.tick(FPS)
+    def update_channels(self, widths):
+        self._widths[0:len(widths)] = widths[0:self.channels]
+        self._update()
+
+    def cancel(self):
+        self.pi.wave_tx_stop()
+        for i in self._wid:
+            if i is not None:
+                self.pi.wave_delete(i)
 
 
+if __name__ == "__main__":
 
+    import time
+    import PPM
+    import pigpio
+
+    pi = pigpio.pi()
+
+    if not pi.connected:
+        exit(0)
+
+    pi.wave_tx_stop()  # Start with a clean slate.
+
+    ppm = PPM.X(pi, 4, frame_ms=20)
+
+    updates = 0
+    start = time.time()
+    for chan in range(8):
+        for pw in range(1000, 2000, 5):
+            ppm.update_channel(chan, pw)
+            updates += 1
+    end = time.time()
+    secs = end - start
+    print("{} updates in {:.1f} seconds ({}/s)".format(updates, secs, int(updates / secs)))
+
+    ppm.update_channels([1000, 2000, 1000, 2000, 1000, 2000, 1000, 2000])
+
+    time.sleep(2)
+
+    ppm.cancel()
+
+    pi.stop()
