@@ -1,0 +1,7 @@
+<application>
+  <component name="GithubAccounts">
+    <account name="OrionDim" id="53858b9a-f5f8-4064-9e30-39f476f73340">
+      <server host="github.com" />
+    </account>
+  </component>
+</application>
