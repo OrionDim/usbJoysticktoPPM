@@ -73,11 +73,11 @@ while True:
     pygame.draw.line(screen, border_color, (pitch_ltx + bar_width, pitch_lty + bar_heigh),
                      (pitch_ltx, pitch_lty + bar_heigh), 2)
     pygame.draw.line(screen, border_color, (pitch_ltx, pitch_lty + bar_heigh), (pitch_ltx, pitch_lty), 2)
-    pygame.draw.polygon(screen, pitch_color, [(pitch_ltx + 2, pitch_lty + bar_heigh - 2),
-                                                (pitch_ltx + bar_width - 1, pitch_lty + bar_heigh - 2), (
-                                                pitch_ltx + bar_width - 1,
-                                                pitch_lty + bar_heigh - current_trottle_pix),
-                                                (pitch_ltx + 2, pitch_lty + bar_heigh - current_trottle_pix)])
+    pygame.draw.polygon(screen, pitch_color, [(int(pitch_ltx + 2), int(pitch_lty + bar_heigh - 2)),
+                                                (int(pitch_ltx + bar_width - 1), int(pitch_lty + bar_heigh - 2)), (
+                                                int(pitch_ltx + bar_width - 1),
+                                                int(pitch_lty + bar_heigh - current_trottle_pix)),
+                                                (int(pitch_ltx + 2), int(pitch_lty + bar_heigh - current_trottle_pix))])
 
     font = pygame.font.SysFont("Arial", 13)
     text = font.render("YAW", True, yaw_color)
@@ -88,11 +88,11 @@ while True:
     pygame.draw.line(screen, border_color, (yaw_ltx + bar_width, yaw_lty + bar_heigh),
                      (yaw_ltx, yaw_lty + bar_heigh), 2)
     pygame.draw.line(screen, border_color, (yaw_ltx, yaw_lty + bar_heigh), (yaw_ltx, yaw_lty), 2)
-    pygame.draw.polygon(screen, yaw_color, [(yaw_ltx + 2, yaw_lty + bar_heigh - 2),
-                                              (yaw_ltx + bar_width - 1, yaw_lty + bar_heigh - 2), (
-                                                  yaw_ltx + bar_width - 1,
-                                                  yaw_lty + bar_heigh - current_trottle_pix),
-                                              (yaw_ltx + 2, yaw_lty + bar_heigh - current_trottle_pix)])
+    pygame.draw.polygon(screen, yaw_color, [(int(yaw_ltx + 2), int(yaw_lty + bar_heigh - 2)),
+                                              (int(yaw_ltx + bar_width - 1), int(yaw_lty + bar_heigh - 2)), (
+                                                  int(yaw_ltx + bar_width - 1),
+                                                  int(yaw_lty + bar_heigh - current_trottle_pix)),
+                                              (int(yaw_ltx + 2), int(yaw_lty + bar_heigh - current_trottle_pix))])
 
     font = pygame.font.SysFont("Arial", 13)
     text = font.render("ROL", True, roll_color)
@@ -103,11 +103,11 @@ while True:
     pygame.draw.line(screen, border_color, (roll_ltx + bar_width, roll_lty + bar_heigh),
                      (roll_ltx, roll_lty + bar_heigh), 2)
     pygame.draw.line(screen, border_color, (roll_ltx, roll_lty + bar_heigh), (roll_ltx, roll_lty), 2)
-    pygame.draw.polygon(screen, roll_color, [(roll_ltx + 2, roll_lty + bar_heigh - 2),
-                                            (roll_ltx + bar_width - 1, roll_lty + bar_heigh - 2), (
-                                                roll_ltx + bar_width - 1,
-                                                roll_lty + bar_heigh - current_trottle_pix),
-                                            (roll_ltx + 2, roll_lty + bar_heigh - current_trottle_pix)])
+    pygame.draw.polygon(screen, roll_color, [(int(roll_ltx + 2), int(roll_lty + bar_heigh - 2)),
+                                            (int(roll_ltx + bar_width - 1), int(roll_lty + bar_heigh - 2)), (
+                                                int(roll_ltx + bar_width - 1),
+                                                int(roll_lty + bar_heigh - current_trottle_pix)),
+                                            (int(roll_ltx + 2), int(roll_lty + bar_heigh - current_trottle_pix))])
 
     for event in pygame.event.get():
         if event.type == QUIT:
