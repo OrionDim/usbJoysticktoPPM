@@ -62,7 +62,7 @@ while True:
     pygame.draw.line(screen, border_color, (trottle_ltx + bar_width, trottle_lty),(trottle_ltx + bar_width, trottle_lty + bar_heigh), 2)
     pygame.draw.line(screen, border_color, (trottle_ltx + bar_width, trottle_lty + bar_heigh),(trottle_ltx, trottle_lty + bar_heigh), 2)
     pygame.draw.line(screen, border_color, (trottle_ltx, trottle_lty + bar_heigh), (trottle_ltx, trottle_lty), 2)
-    pygame.draw.polygon(screen, trottle_color, [(trottle_ltx+2,trottle_lty+bar_heigh-2), (trottle_ltx+bar_width-1,trottle_lty+bar_heigh-2), (trottle_ltx+bar_width-1,trottle_lty+bar_heigh-current_trottle_pix), (trottle_ltx+2,trottle_lty+bar_heigh-current_trottle_pix)])
+    pygame.draw.polygon(screen, trottle_color, [(int(trottle_ltx+2),int(trottle_lty+bar_heigh-2)), (int(trottle_ltx+bar_width-1),int(trottle_lty+bar_heigh-2)), (int(trottle_ltx+bar_width-1),int(trottle_lty+bar_heigh-current_trottle_pix)), (int(trottle_ltx+2),int(trottle_lty+bar_heigh-current_trottle_pix))])
 
     font = pygame.font.SysFont("Arial", 13)
     text = font.render("PTH", True, pitch_color)
