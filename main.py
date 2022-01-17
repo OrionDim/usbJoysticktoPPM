@@ -54,11 +54,11 @@ while True:
     screen.fill((100, 100, 100))
 
     for event in pygame.event.get():
-        if event.type == JOYBUTTONDOWN:
+        if event.type == pygame.JOYBUTTONDOWN:
             if event.button != 24: print(event)
-        if event.type == JOYBUTTONUP:
+        if event.type == pygame.JOYBUTTONUP:
             if event.button != 24: print(event)
-        if event.type == JOYAXISMOTION:
+        if event.type == pygame.JOYAXISMOTION:
             if event.axis == 0:
                 roll_value=int(event.value*1000)
                 #print('ROLL:', event.value*2000)
@@ -72,18 +72,18 @@ while True:
                     event.value=(event.value+1)/2*2000
                 #print('TROTTLE:', event.value)
                 throttle_value = int(event.value)
-        if event.type == JOYHATMOTION:
+        if event.type == pygame.JOYHATMOTION:
             print(event)
-        if event.type == JOYDEVICEADDED:
+        if event.type == pygame.JOYDEVICEADDED:
             joysticks = [pygame.joystick.Joystick(i) for i in range(pygame.joystick.get_count())]
             for joystick in joysticks:
                 print(joystick.get_name())
-        if event.type == JOYDEVICEREMOVED:
+        if event.type == pygame.JOYDEVICEREMOVED:
             joysticks = [pygame.joystick.Joystick(i) for i in range(pygame.joystick.get_count())]
         if event.type == QUIT:
             pygame.quit()
             sys.exit()
-        if event.type == KEYDOWN:
+        if event.type == pygame.KEYDOWN:
             if event.key == K_ESCAPE:
                 pygame.quit()
                 sys.exit()
