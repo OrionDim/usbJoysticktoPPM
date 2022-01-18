@@ -2,13 +2,10 @@
 
 import sys
 import pygame
+import uj2ppm_config
 from pygame.locals import *
 
-bar_height = 150
-bar_width = 30
-border_color = [255, 0, 0]
 
-FPS = 30  # frames per second setting
 fpsClock = pygame.time.Clock()
 
 pygame.init()
@@ -18,35 +15,6 @@ pygame.joystick.init()
 joysticks = [pygame.joystick.Joystick(i) for i in range(pygame.joystick.get_count())]
 # for joystick in joysticks:
 #    print(joystick.get_name())
-
-throttle_now = 0
-throttle_max = 2000
-throttle_ltx = 10
-throttle_lty = 30
-throttle_color = [0, 0, 255]
-
-pitch_now = 0
-pitch_max = 2000
-pitch_ltx = 50
-pitch_lty = 30
-pitch_color = [0, 0, 255]
-
-roll_now = 0
-roll_max = 2000
-roll_ltx = 100
-roll_lty = 30
-roll_color = [0, 0, 255]
-
-yaw_now = 0
-yaw_max = 2000
-yaw_ltx = 150
-yaw_lty = 30
-yaw_color = [0, 0, 255]
-
-throttle_value = 0
-yaw_value = 0
-pitch_value = 0
-roll_value = 0
 
 # TODO make config file JSON
 
@@ -90,6 +58,17 @@ while True:
             if event.key == K_ESCAPE:
                 pygame.quit()
                 sys.exit()
+
+    # TODO Check Buttons: ARM
+    # TODO Check Buttons: CRUISE
+    # TODO Check Buttons: RTH
+    # TODO Check Buttons: LOITER
+    # TODO Check Buttons: AUTOTUNE
+    # TODO Check Buttons: ADD BUTTON 1
+    # TODO Check Buttons: ADD BUTTON 2
+    # TODO Check Buttons: ADD BUTTON 3
+    # TODO Check Buttons: ADD BUTTON 4
+
     current_pitch_pix = bar_height * pitch_value / throttle_max
     current_roll_pix = bar_height * roll_value / throttle_max
     current_yaw_pix = bar_height * yaw_value / throttle_max
@@ -157,7 +136,8 @@ while True:
                                                  int(roll_ltx + bar_width - 1),
                                                  int(roll_lty + bar_height / 2 - current_roll_pix)),
                                              (int(roll_ltx + 2), int(roll_lty + bar_height / 2 - current_roll_pix))])
-    # TODO Make PPM output 
+    # TODO Make PPM output
+
 
     for event in pygame.event.get():
         if event.type == QUIT:
