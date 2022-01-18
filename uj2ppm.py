@@ -1,3 +1,7 @@
+#https://www.raspberrypi-spy.co.uk/wp-content/uploads/2012/06/Raspberry-Pi-GPIO-Header-with-Photo-702x336.png
+
+
+
 import sys
 import pygame
 from pygame.locals import *
@@ -48,6 +52,8 @@ throttle_value=0
 yaw_value=0
 pitch_value=0
 roll_value=0
+
+#TODO сделать файл конфигурации
 
 while True:
 
@@ -152,6 +158,7 @@ while True:
                                                  int(roll_ltx + bar_width - 1),
                                                  int(roll_lty + bar_heigh/2 - current_roll_pix)),
                                              (int(roll_ltx + 2), int(roll_lty + bar_heigh/2 - current_roll_pix))])
+    #TODO Сделать вывод в PPM
 
     for event in pygame.event.get():
         if event.type == QUIT:
