@@ -1,5 +1,8 @@
 <application>
   <component name="FindSettings">
+    <option name="customScope" value="File '…/uj2ppm.py'" />
+    <option name="defaultScopeName" value="File '…/uj2ppm.py'" />
+    <option name="SEARCH_SCOPE" value="File '…/uj2ppm.py'" />
     <mask>*.css</mask>
     <mask>*.html</mask>
     <mask>*.xml</mask>
